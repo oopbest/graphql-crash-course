@@ -2,7 +2,7 @@ import { users } from "../dummyData/data.js";
 
 const userResolver = {
   Query: {
-    users: () => users,
+    users: (_, __, { req, res }) => users,
     user: (_, { userId }) => users.find((user) => user._id === userId),
   },
   Mutation: {},
