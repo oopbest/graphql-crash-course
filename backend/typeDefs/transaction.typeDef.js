@@ -12,13 +12,13 @@ const transactionTypeDef = `#graphql
 
   type Query {
     transactions: [Transaction]
-    transaction(id: ID!): Transaction
+    transaction(transactionId: ID!): Transaction
   }
 
   type Mutation {
     createTransaction(input: CreateTransactionInput!): Transaction!
     updateTransaction(input: UpdateTransactionInput!): Transaction!
-    deleteTransaction(id: ID!): Transaction!
+    deleteTransaction(transactionId: ID!): Transaction!
   }
   
   input CreateTransactionInput {
