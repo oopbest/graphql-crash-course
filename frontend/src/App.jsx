@@ -32,7 +32,7 @@ function App() {
           element={!data.authUser ? <LoginPage /> : <Navigate to="/" />}
         />
         <Route
-          path="/transaction"
+          path="/transaction/:id"
           element={
             data.authUser ? <TransactionPage /> : <Navigate to="/login" />
           }
