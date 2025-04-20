@@ -7,6 +7,7 @@ import { GET_TRANSACTION } from "../graphql/queries/transaction.query";
 import TransactionFormSkeleton from "../components/skeletons/TransactionFormSkeleton";
 import { UPDATE_TRANSACTION } from "../graphql/mutations/transaction.mutation";
 import { toast } from "react-hot-toast";
+import { GET_TRANSACTION_STATISTICS } from "../graphql/queries/transaction.query";
 
 const TransactionPage = () => {
   const { id } = useParams();
@@ -15,8 +16,15 @@ const TransactionPage = () => {
     variables: { transactionId: id },
   });
 
-  const [updateTransaction, { loading: loadingUpdate }] =
-    useMutation(UPDATE_TRANSACTION);
+  console.log("Trasaction data:", data);
+
+  const [updateTransaction, { loading: loadingUpdate }] = useMutation(
+    UPDATE_TRANSACTION,
+    {
+      // https://github.com/apollographql/apollo-client/issues/5419 => refetchQueries is not working, and here is how we fixed it
+      refetchQueries: [{ query: GET_TRANSACTION_STATISTICS }],
+    }
+  );
 
   const [formData, setFormData] = useState({
     description: data?.transaction?.description || "",
@@ -57,12 +65,12 @@ const TransactionPage = () => {
   useEffect(() => {
     if (data) {
       setFormData({
-        description: data.transaction.description,
-        paymentType: data.transaction.paymentType,
-        category: data.transaction.category,
-        amount: data.transaction.amount,
-        location: data.transaction.location,
-        date: new Date(+data.transaction.date).toISOString().substr(0, 10),
+        description: data?.transaction?.description,
+        paymentType: data?.transaction?.paymentType,
+        category: data?.transaction?.category,
+        amount: data?.transaction?.amount,
+        location: data?.transaction?.location,
+        date: new Date(+data?.transaction?.date).toISOString().substr(0, 10),
       });
     }
   }, [data]);

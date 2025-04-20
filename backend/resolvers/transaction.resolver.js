@@ -1,4 +1,5 @@
 import Transaction from "../models/transaction.model.js";
+import User from "../models/user.model.js";
 
 const transactionResolver = {
   Query: {
@@ -28,6 +29,26 @@ const transactionResolver = {
         console.log("Error in transaction resolver:", error);
         throw new Error(error.message || "Internal server error");
       }
+    },
+
+    categoryStatistics: async (_, __, context) => {
+      if (!context.getUser()) throw new Error("Unauthorized");
+
+      const userId = context.getUser()._id;
+      const transactions = await Transaction.find({ userId });
+      const categoryMap = {};
+
+      transactions.forEach((transaction) => {
+        if (!categoryMap[transaction.category]) {
+          categoryMap[transaction.category] = 0;
+        }
+        categoryMap[transaction.category] += transaction.amount;
+      });
+
+      return Object.entries(categoryMap).map(([category, totalAmount]) => ({
+        category,
+        totalAmount,
+      }));
     },
   },
   Mutation: {
@@ -64,6 +85,17 @@ const transactionResolver = {
         return deletedTransaction;
       } catch (error) {
         console.log("Error in deleteTransaction resolver:", error);
+        throw new Error(error.message || "Internal server error");
+      }
+    },
+  },
+  Transaction: {
+    user: async (parent) => {
+      try {
+        const user = await User.findById(parent.userId);
+        return user;
+      } catch (error) {
+        console.log("Error in user resolver:", error);
         throw new Error(error.message || "Internal server error");
       }
     },
